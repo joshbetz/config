@@ -1,0 +1,12 @@
+language: go
+
+go:
+    - 1.8.x
+    - master
+
+install:
+    - go get -d -v ./...
+
+script:
+    - ./ci/gofmt.sh
+    - go test -v ./...
