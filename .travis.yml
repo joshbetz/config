@@ -10,3 +10,6 @@ install:
 script:
     - ./ci/gofmt.sh
     - go test -v ./...
+
+after_success:
+    - go test -bench=.
