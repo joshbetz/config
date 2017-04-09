@@ -15,11 +15,11 @@ func main() {
 		err := config.Get("config.json", "value", &value)
 
 		if err != nil {
-			fmt.Fprintf(w, "Error: %s", err)
+			fmt.Fprintf(w, "Error: %s\n", err)
 			return
 		}
 
-		fmt.Fprintf(w, "Value: %s", value)
+		fmt.Fprintf(w, "Value: %s\n", value)
 	})
 
 	log.Fatal(http.ListenAndServe(":3000", nil))
