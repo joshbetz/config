@@ -19,7 +19,7 @@ func main() {
 }
 ```
 
-![Reload config on SIGHUP](http://i.imgur.com/G2dramp.gif)
+![Reload config on SIGHUP](http://i.imgur.com/6H8b6zy.gif)
 
 ## API
 
