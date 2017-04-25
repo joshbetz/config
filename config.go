@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 )
 
@@ -15,7 +16,7 @@ var cache map[string]map[string]interface{}
 func Get(file, key string, v interface{}) error {
 	var val interface{}
 
-	val, set := os.LookupEnv(key)
+	env, set := os.LookupEnv(key)
 
 	if !set {
 		if cache[file] == nil {
@@ -25,6 +26,19 @@ func Get(file, key string, v interface{}) error {
 		}
 
 		val = cache[file][key]
+	} else {
+		switch v.(type) {
+		case *float64:
+			i, err := strconv.Atoi(env)
+
+			if err != nil {
+				return err
+			}
+
+			val = float64(i)
+		default:
+			val = env
+		}
 	}
 
 	switch v.(type) {
