@@ -83,8 +83,8 @@ func TestGet(t *testing.T) {
 				t.Error(err)
 			}
 
-			if f != 64 {
-				t.Errorf("Expected '64', got '%v'", f)
+			if f != 64.4 {
+				t.Errorf("Expected '64.4', got '%v'", f)
 			}
 		})
 
@@ -111,6 +111,19 @@ func TestGet(t *testing.T) {
 
 			if s != "abcd" {
 				t.Errorf("Expected 'abcd', got '%v'", s)
+			}
+		})
+
+		t.Run("should successfully cast float to int", func(t *testing.T) {
+			var i int
+
+			err := Get("test.json", "float64", &i)
+			if err != nil {
+				t.Error(err)
+			}
+
+			if i != 64 {
+				t.Errorf("Expected '64', got '%v'", i)
 			}
 		})
 	})

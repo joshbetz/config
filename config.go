@@ -18,7 +18,30 @@ func Get(file, key string, v interface{}) error {
 
 	env, set := os.LookupEnv(key)
 
-	if !set {
+	if set {
+		switch v.(type) {
+		case *float64:
+			val, err := strconv.ParseFloat(env, 64)
+
+			if err != nil {
+				return err
+			}
+
+			*v.(*float64) = val
+			return nil
+		case *int:
+			val, err := strconv.ParseInt(env, 10, 64)
+
+			if err != nil {
+				return err
+			}
+
+			*v.(*int) = int(val)
+			return nil
+		default:
+			val = env
+		}
+	} else {
 		if cache[file] == nil {
 			if err := primeCacheFromFile(file); err != nil {
 				return err
@@ -26,21 +49,9 @@ func Get(file, key string, v interface{}) error {
 		}
 
 		val = cache[file][key]
-	} else {
-		switch v.(type) {
-		case *float64:
-			i, err := strconv.Atoi(env)
-
-			if err != nil {
-				return err
-			}
-
-			val = float64(i)
-		default:
-			val = env
-		}
 	}
 
+	// Cast JSON values
 	switch v.(type) {
 	case *string:
 		if val == nil {
@@ -51,8 +62,10 @@ func Get(file, key string, v interface{}) error {
 	case *bool:
 		switch val {
 		case nil, 0, false, "", "0", "false":
+			// fasley
 			val = false
 		default:
+			// truthy
 			val = true
 		}
 
@@ -63,6 +76,12 @@ func Get(file, key string, v interface{}) error {
 		}
 
 		*v.(*float64) = val.(float64)
+	case *int:
+		if val == nil {
+			val = float64(0)
+		}
+
+		*v.(*int) = int(val.(float64))
 	default:
 		return errors.New("Type not supported")
 	}
