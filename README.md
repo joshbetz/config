@@ -9,9 +9,11 @@ files, and reloads automatically on `SIGHUP`.
 
 ```go
 func main() {
+	c := config.New("config.json")
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var value string
-		config.Get("config.json", "value", &value)
+		c.Get("value", &value)
 		fmt.Fprintf(w, "Value: %s", value)
 	})
 
@@ -24,7 +26,13 @@ func main() {
 ## API
 
 ```go
-func Get(file, key string, v interface{}) error
+func New(file) *Config
+```
+
+Constructor that initializes a Config object and sets up the SIGHUP watcher.
+
+```go
+func (this *Config) Get(key string, v interface{}) error
 ```
 
 Takes the path to a JSON file, the name of the configuration option, and a
@@ -32,7 +40,7 @@ pointer to the variable where the config value will be stored. `v` can be a
 pointer to a string, bool, or float64.
 
 ```go
-func Reload()
+func (this *Config) Reload()
 ```
 
 Reloads the config. Happens automatically on `SIGHUP`.

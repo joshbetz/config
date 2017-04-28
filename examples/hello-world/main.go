@@ -9,10 +9,11 @@ import (
 )
 
 func main() {
+	c := config.New("config.json")
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var value string
-
-		err := config.Get("config.json", "value", &value)
+		err := c.Get("value", &value)
 
 		if err != nil {
 			fmt.Fprintf(w, "Error: %s\n", err)

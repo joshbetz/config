@@ -7,18 +7,22 @@ import (
 )
 
 func BenchmarkGet(b *testing.B) {
+	c := New("test.json")
+
 	var v string
 	for i := 0; i < b.N; i++ {
-		Get("test.json", "test", &v)
+		c.Get("test", &v)
 	}
 }
 
 func TestGet(t *testing.T) {
+	c := New("test.json")
+
 	t.Run("Get", func(t *testing.T) {
 		t.Run("should successfully retrieve string", func(t *testing.T) {
 			var s string
 
-			err := Get("test.json", "string", &s)
+			err := c.Get("string", &s)
 			if err != nil {
 				t.Error(err)
 			}
@@ -39,7 +43,7 @@ func TestGet(t *testing.T) {
 		t.Run("should successfully retrieve bool", func(t *testing.T) {
 			var b bool
 
-			err := Get("test.json", "bool", &b)
+			err := c.Get("bool", &b)
 			if err != nil {
 				t.Error(err)
 			}
@@ -52,7 +56,7 @@ func TestGet(t *testing.T) {
 		t.Run("should successfully cast string to bool", func(t *testing.T) {
 			var b bool
 
-			err := Get("test.json", "string", &b)
+			err := c.Get("string", &b)
 			if err != nil {
 				t.Error(err)
 			}
@@ -65,7 +69,7 @@ func TestGet(t *testing.T) {
 		t.Run("should successfully cast float to bool", func(t *testing.T) {
 			var b bool
 
-			err := Get("test.json", "float64", &b)
+			err := c.Get("float64", &b)
 			if err != nil {
 				t.Error(err)
 			}
@@ -78,7 +82,7 @@ func TestGet(t *testing.T) {
 		t.Run("should successfully retrieve float64", func(t *testing.T) {
 			var f float64
 
-			err := Get("test.json", "float64", &f)
+			err := c.Get("float64", &f)
 			if err != nil {
 				t.Error(err)
 			}
@@ -104,7 +108,7 @@ func TestGet(t *testing.T) {
 				t.Error(err)
 			}
 
-			err = Get("test.json", "string", &s)
+			err = c.Get("string", &s)
 			if err != nil {
 				t.Error(err)
 			}
@@ -117,7 +121,7 @@ func TestGet(t *testing.T) {
 		t.Run("should successfully cast float to int", func(t *testing.T) {
 			var i int
 
-			err := Get("test.json", "float64", &i)
+			err := c.Get("float64", &i)
 			if err != nil {
 				t.Error(err)
 			}

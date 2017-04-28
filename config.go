@@ -11,9 +11,19 @@ import (
 	"syscall"
 )
 
-var cache map[string]map[string]interface{}
+type Config struct {
+	filename string
+	cache    *map[string]interface{}
+}
 
-func Get(file, key string, v interface{}) error {
+func New(filename string) *Config {
+	c := Config{filename, nil}
+	c.Reload()
+	go c.watch()
+	return &c
+}
+
+func (this *Config) Get(key string, v interface{}) error {
 	var val interface{}
 
 	env, set := os.LookupEnv(key)
@@ -41,14 +51,8 @@ func Get(file, key string, v interface{}) error {
 		default:
 			val = env
 		}
-	} else {
-		if cache[file] == nil {
-			if err := primeCacheFromFile(file); err != nil {
-				return err
-			}
-		}
-
-		val = cache[file][key]
+	} else if this.cache != nil {
+		val = (*this.cache)[key]
 	}
 
 	// Cast JSON values
@@ -89,46 +93,46 @@ func Get(file, key string, v interface{}) error {
 	return nil
 }
 
-func Reload() {
-	// Empty the cache
-	cache = make(map[string]map[string]interface{})
+func (this *Config) Reload() error {
+	cache, err := primeCacheFromFile(this.filename)
+	this.cache = cache
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func primeCacheFromFile(file string) error {
+func (this *Config) watch() {
+	// Catch SIGHUP to automatically reload cache
+	sighup := make(chan os.Signal, 1)
+	signal.Notify(sighup, syscall.SIGHUP)
+
+	for {
+		<-sighup
+		fmt.Println("Caught SIGHUP, reloading config...")
+		this.Reload()
+	}
+}
+
+func primeCacheFromFile(file string) (*map[string]interface{}, error) {
 	// File exists?
 	if _, err := os.Stat(file); os.IsNotExist(err) {
-		return err
+		return nil, err
 	}
 
 	// Read file
 	raw, err := ioutil.ReadFile(file)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Unmarshal
 	var config map[string]interface{}
 	if err := json.Unmarshal(raw, &config); err != nil {
-		return err
+		return nil, err
 	}
 
-	// prime cache
-	cache[file] = config
-	return nil
-}
-
-func init() {
-	Reload()
-
-	// Catch SIGHUP to automatically reload cache
-	sighup := make(chan os.Signal, 1)
-	signal.Notify(sighup, syscall.SIGHUP)
-
-	go func() {
-		for {
-			<-sighup
-			fmt.Println("Caught SIGHUP, reloading config...")
-			Reload()
-		}
-	}()
+	return &config, nil
 }
