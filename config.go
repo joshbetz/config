@@ -125,12 +125,10 @@ func init() {
 	signal.Notify(sighup, syscall.SIGHUP)
 
 	go func() {
-		for sig := range sighup {
-			switch sig {
-			case syscall.SIGHUP:
-				fmt.Println("Caught SIGHUP, reloading config...")
-				Reload()
-			}
+		for {
+			<-sighup
+			fmt.Println("Caught SIGHUP, reloading config...")
+			Reload()
 		}
 	}()
 }
