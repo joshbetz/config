@@ -3,8 +3,8 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/signal"
 	"strconv"
@@ -105,13 +105,15 @@ func (this *Config) Reload() error {
 }
 
 func (this *Config) watch() {
+	l := log.New(os.Stderr, "", 0)
+
 	// Catch SIGHUP to automatically reload cache
 	sighup := make(chan os.Signal, 1)
 	signal.Notify(sighup, syscall.SIGHUP)
 
 	for {
 		<-sighup
-		fmt.Println("Caught SIGHUP, reloading config...")
+		l.Println("Caught SIGHUP, reloading config...")
 		this.Reload()
 	}
 }
