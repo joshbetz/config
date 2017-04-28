@@ -66,7 +66,7 @@ func (this *Config) Get(key string, v interface{}) error {
 	case *bool:
 		switch val {
 		case nil, 0, false, "", "0", "false":
-			// fasley
+			// falsey
 			val = false
 		default:
 			// truthy
