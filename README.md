@@ -26,13 +26,13 @@ func main() {
 ## API
 
 ```go
-func New(file) *Config
+func New(file string) *Config
 ```
 
 Constructor that initializes a Config object and sets up the SIGHUP watcher.
 
 ```go
-func (this *Config) Get(key string, v interface{}) error
+func (config *Config) Get(key string, v interface{}) error
 ```
 
 Takes the path to a JSON file, the name of the configuration option, and a
@@ -40,7 +40,7 @@ pointer to the variable where the config value will be stored. `v` can be a
 pointer to a string, bool, or float64.
 
 ```go
-func (this *Config) Reload()
+func (config *Config) Reload()
 ```
 
 Reloads the config. Happens automatically on `SIGHUP`.
