@@ -17,13 +17,13 @@ type Config struct {
 }
 
 func New(filename string) *Config {
-	c := Config{filename, nil}
-	c.Reload()
-	go c.watch()
-	return &c
+	config := Config{filename, nil}
+	config.Reload()
+	go config.watch()
+	return &config
 }
 
-func (this *Config) Get(key string, v interface{}) error {
+func (config *Config) Get(key string, v interface{}) error {
 	var val interface{}
 
 	env, set := os.LookupEnv(key)
@@ -51,8 +51,8 @@ func (this *Config) Get(key string, v interface{}) error {
 		default:
 			val = env
 		}
-	} else if this.cache != nil {
-		val = (*this.cache)[key]
+	} else if config.cache != nil {
+		val = (*config.cache)[key]
 	}
 
 	// Cast JSON values
@@ -93,9 +93,9 @@ func (this *Config) Get(key string, v interface{}) error {
 	return nil
 }
 
-func (this *Config) Reload() error {
-	cache, err := primeCacheFromFile(this.filename)
-	this.cache = cache
+func (config *Config) Reload() error {
+	cache, err := primeCacheFromFile(config.filename)
+	config.cache = cache
 
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (this *Config) Reload() error {
 	return nil
 }
 
-func (this *Config) watch() {
+func (config *Config) watch() {
 	l := log.New(os.Stderr, "", 0)
 
 	// Catch SIGHUP to automatically reload cache
@@ -114,7 +114,7 @@ func (this *Config) watch() {
 	for {
 		<-sighup
 		l.Println("Caught SIGHUP, reloading config...")
-		this.Reload()
+		config.Reload()
 	}
 }
 
