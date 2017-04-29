@@ -11,11 +11,13 @@ import (
 	"syscall"
 )
 
+// Config represents a configuration file.
 type Config struct {
 	filename string
 	cache    *map[string]interface{}
 }
 
+// New creates a new Config object.
 func New(filename string) *Config {
 	config := Config{filename, nil}
 	config.Reload()
@@ -23,6 +25,7 @@ func New(filename string) *Config {
 	return &config
 }
 
+// Get retreives a Config option into a passed in pointer or returns an error.
 func (config *Config) Get(key string, v interface{}) error {
 	var val interface{}
 
@@ -93,6 +96,7 @@ func (config *Config) Get(key string, v interface{}) error {
 	return nil
 }
 
+// Reload clears the config cache.
 func (config *Config) Reload() error {
 	cache, err := primeCacheFromFile(config.filename)
 	config.cache = cache
