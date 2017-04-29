@@ -5,12 +5,14 @@ go:
     - master
 
 install:
+    - go get github.com/golang/lint/golint
     - go get -d -v ./...
 
 script:
     - go build -v
-    - test -z "$(gofmt -s -l . | grep -v vendor | tee /dev/stderr)"
     - go vet ./...
+    - test -z "$(gofmt -s -l . | grep -v vendor | tee /dev/stderr)"
+    - test -z "$(golint ./... | grep -v vendor | tee /dev/stderr)"
     - go test -v ./...
 
 after_success:
