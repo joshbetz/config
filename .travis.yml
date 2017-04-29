@@ -8,7 +8,9 @@ install:
     - go get -d -v ./...
 
 script:
-    - ./ci/gofmt.sh
+    - go build -v
+    - test -z "$(gofmt -s -l . | grep -v vendor | tee /dev/stderr)"
+    - go vet ./...
     - go test -v ./...
 
 after_success:
