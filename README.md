@@ -1,6 +1,7 @@
 # config
 
-[![Build Status](https://travis-ci.org/joshbetz/config.svg?branch=master)](https://travis-ci.org/joshbetz/config)
+[![Build Status](https://travis-ci.org/joshbetz/config.svg?branch=master)](https://travis-ci.org/joshbetz/config) [![](https://godoc.org/github.com/joshbetz/config?status.svg)](http://godoc.org/github.com/joshbetz/config)
+
 
 A small configuration library for Go that parses environment variables, JSON
 files, and reloads automatically on `SIGHUP`.
