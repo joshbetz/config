@@ -1,6 +1,6 @@
 # config
 
-[![Build Status](https://travis-ci.org/joshbetz/config.svg?branch=master)](https://travis-ci.org/joshbetz/config) [![](https://godoc.org/github.com/joshbetz/config?status.svg)](http://godoc.org/github.com/joshbetz/config)
+[![Build Status](https://travis-ci.org/joshbetz/config.svg?branch=master)](https://travis-ci.org/joshbetz/config) [![Go Report Card](https://goreportcard.com/badge/github.com/joshbetz/config)](https://goreportcard.com/report/github.com/joshbetz/config) [![](https://godoc.org/github.com/joshbetz/config?status.svg)](http://godoc.org/github.com/joshbetz/config)
 
 
 A small configuration library for Go that parses environment variables, JSON
