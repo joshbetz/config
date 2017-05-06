@@ -186,5 +186,21 @@ func TestGet(t *testing.T) {
 				t.Error("Expected an error, got nil")
 			}
 		})
+
+		t.Run("should correctly error for nonexistant files", func(t *testing.T) {
+			c2 := New("nonexistant.json")
+			err := c2.Reload()
+			if err == nil {
+				t.Error("Expected an error, got nil")
+			}
+		})
+
+		t.Run("should correctly error for invalid files", func(t *testing.T) {
+			c2 := New("invalid.json")
+			err := c2.Reload()
+			if err == nil {
+				t.Error("Expected an error, got nil")
+			}
+		})
 	})
 }
