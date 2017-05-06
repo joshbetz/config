@@ -32,6 +32,19 @@ func TestGet(t *testing.T) {
 			}
 		})
 
+		t.Run("should successfully cast empty value to string", func(t *testing.T) {
+			var s string
+
+			err := c.Get("nonexistant", &s)
+			if err != nil {
+				t.Error(err)
+			}
+
+			if s != "" {
+				t.Errorf("Expected '', got '%v'", s)
+			}
+		})
+
 		t.Run("should successfully cast bool to string", func(t *testing.T) {
 			t.Skip()
 		})
@@ -63,6 +76,19 @@ func TestGet(t *testing.T) {
 
 			if b != true {
 				t.Errorf("Expected 'true', got '%v'", b)
+			}
+		})
+
+		t.Run("should successfully cast empty value to bool", func(t *testing.T) {
+			var b bool
+
+			err := c.Get("nonexistant", &b)
+			if err != nil {
+				t.Error(err)
+			}
+
+			if b != false {
+				t.Errorf("Expected 'false', got '%v'", b)
 			}
 		})
 
@@ -100,6 +126,19 @@ func TestGet(t *testing.T) {
 
 			if f != 64.4 {
 				t.Errorf("Expected '64.4', got '%v'", f)
+			}
+		})
+
+		t.Run("should successfully cast empty value to float64", func(t *testing.T) {
+			var f float64
+
+			err := c.Get("nonexistant", &f)
+			if err != nil {
+				t.Error(err)
+			}
+
+			if f != 0 {
+				t.Errorf("Expected '0', got '%v'", f)
 			}
 		})
 
@@ -175,6 +214,19 @@ func TestGet(t *testing.T) {
 
 			if i != 64 {
 				t.Errorf("Expected '64', got '%v'", i)
+			}
+		})
+
+		t.Run("should correctly cast empty value to int", func(t *testing.T) {
+			var i int
+
+			err := c.Get("nonexistant", &i)
+			if err != nil {
+				t.Error(err)
+			}
+
+			if i != 0 {
+				t.Errorf("Expected '0', got '%v'", i)
 			}
 		})
 
