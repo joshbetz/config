@@ -69,6 +69,7 @@ func TestGet(t *testing.T) {
 		t.Run("should successfully cast float to bool", func(t *testing.T) {
 			var b bool
 
+			// truthy
 			err := c.Get("float64", &b)
 			if err != nil {
 				t.Error(err)
@@ -76,6 +77,16 @@ func TestGet(t *testing.T) {
 
 			if b != true {
 				t.Errorf("Expected 'true', got '%v'", b)
+			}
+
+			// falsey
+			err = c.Get("falsey", &b)
+			if err != nil {
+				t.Error(err)
+			}
+
+			if b != false {
+				t.Errorf("Expected 'false', got '%v'", b)
 			}
 		})
 
@@ -115,6 +126,42 @@ func TestGet(t *testing.T) {
 
 			if s != "abcd" {
 				t.Errorf("Expected 'abcd', got '%v'", s)
+			}
+		})
+
+		t.Run("should correctly cast env to float64", func(t *testing.T) {
+			var f float64
+
+			err := os.Setenv("float64-2", "50")
+			if err != nil {
+				t.Error(err)
+			}
+
+			err = c.Get("float64-2", &f)
+			if err != nil {
+				t.Error(err)
+			}
+
+			if f != 50 {
+				t.Errorf("Expected '50', got '%v'", f)
+			}
+		})
+
+		t.Run("should correctly cast env to int", func(t *testing.T) {
+			var i int
+
+			err := os.Setenv("int", "50")
+			if err != nil {
+				t.Error(err)
+			}
+
+			err = c.Get("int", &i)
+			if err != nil {
+				t.Error(err)
+			}
+
+			if i != 50 {
+				t.Errorf("Expected '50', got '%v'", i)
 			}
 		})
 
