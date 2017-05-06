@@ -177,5 +177,14 @@ func TestGet(t *testing.T) {
 				t.Errorf("Expected '64', got '%v'", i)
 			}
 		})
+
+		t.Run("should correctly error for invalid types", func(t *testing.T) {
+			var r rune
+
+			err := c.Get("float64", &r)
+			if err == nil {
+				t.Error("Expected an error, got nil")
+			}
+		})
 	})
 }
