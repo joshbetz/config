@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -104,13 +103,10 @@ func (config *Config) Get(key string, v interface{}) error {
 func (config *Config) Reload() error {
 	cache, err := primeCacheFromFile(config.filename)
 	config.cache = cache
-	fmt.Println("===cache", cache)
 
 	if err != nil {
-		fmt.Println("===cacaca", err)
 		return err
 	}
-	fmt.Println("===cacaca")
 
 	return nil
 }
