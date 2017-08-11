@@ -18,11 +18,14 @@ type Config struct {
 }
 
 // New creates a new Config object.
-func New(filename string) *Config {
+func New(filename string) (*Config, error) {
 	config := Config{filename, nil}
-	config.Reload()
+	err := config.Reload()
+	if err != nil {
+		return nil, err
+	}
 	go config.watch()
-	return &config
+	return &config, nil
 }
 
 // Get retreives a Config option into a passed in pointer or returns an error.
@@ -99,11 +102,10 @@ func (config *Config) Get(key string, v interface{}) error {
 // Reload clears the config cache.
 func (config *Config) Reload() error {
 	cache, err := primeCacheFromFile(config.filename)
-	config.cache = cache
-
 	if err != nil {
 		return err
 	}
+	config.cache = cache
 
 	return nil
 }

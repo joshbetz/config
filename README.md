@@ -10,7 +10,11 @@ files, and reloads automatically on `SIGHUP`.
 
 ```go
 func main() {
-	c := config.New("config.json")
+	c,err := config.New("config.json")
+	if err != nil {
+		fmt.Println("init config faild",err)
+		return
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var value string
