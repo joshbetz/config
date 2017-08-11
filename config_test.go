@@ -1,13 +1,17 @@
 package config
 
 import (
+	"fmt"
 	"testing"
 
 	"os"
 )
 
 func BenchmarkGet(b *testing.B) {
-	c := New("test.json")
+	c, err := New("test.json")
+	if err != nil {
+		b.Error(err)
+	}
 
 	var v string
 	for i := 0; i < b.N; i++ {
@@ -16,7 +20,10 @@ func BenchmarkGet(b *testing.B) {
 }
 
 func TestGet(t *testing.T) {
-	c := New("test.json")
+	c, err := New("test.json")
+	if err != nil {
+		t.Error(err)
+	}
 
 	t.Run("Get", func(t *testing.T) {
 		t.Run("should successfully retrieve string", func(t *testing.T) {
@@ -240,16 +247,24 @@ func TestGet(t *testing.T) {
 		})
 
 		t.Run("should correctly error for nonexistant files", func(t *testing.T) {
-			c2 := New("nonexistant.json")
-			err := c2.Reload()
+			c2, err := New("nonexistant.json")
+			if err != nil {
+				fmt.Println("err nonexistant.json", err)
+				return
+			}
+			err = c2.Reload()
 			if err == nil {
 				t.Error("Expected an error, got nil")
 			}
 		})
 
 		t.Run("should correctly error for invalid files", func(t *testing.T) {
-			c2 := New("invalid.json")
-			err := c2.Reload()
+			c2, err := New("invalid.json")
+			if err != nil {
+				fmt.Println("err invalid.json", err)
+				return
+			}
+			err = c2.Reload()
 			if err == nil {
 				t.Error("Expected an error, got nil")
 			}

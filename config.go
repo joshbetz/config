@@ -102,11 +102,10 @@ func (config *Config) Get(key string, v interface{}) error {
 // Reload clears the config cache.
 func (config *Config) Reload() error {
 	cache, err := primeCacheFromFile(config.filename)
-	config.cache = cache
-
 	if err != nil {
 		return err
 	}
+	config.cache = cache
 
 	return nil
 }
