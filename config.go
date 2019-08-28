@@ -88,7 +88,22 @@ func (config *Config) Get(key string, v interface{}) error {
 			val = float64(0)
 		}
 
-		*v.(*float64) = val.(float64)
+		if s, ok := val.(string); ok {
+			pf, err := strconv.ParseFloat(s, 64)
+			if err != nil {
+				return err
+			}
+
+			*v.(*float64) = pf
+		} else if b, ok := val.(bool); ok {
+			if b == true {
+				*v.(*float64) = 1.0
+			} else {
+				*v.(*float64) = 0
+			}
+		} else {
+			*v.(*float64) = val.(float64)
+		}
 	case *int:
 		if val == nil {
 			val = float64(0)
