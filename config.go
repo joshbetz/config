@@ -65,7 +65,13 @@ func (config *Config) Get(key string, v interface{}) error {
 			val = ""
 		}
 
-		*v.(*string) = val.(string)
+		if b, ok := val.(bool); ok {
+			*v.(*string) = strconv.FormatBool(b)
+		} else if f, ok := val.(float64); ok {
+			*v.(*string) = strconv.FormatFloat(f, 'f', -1, 64)
+		} else {
+			*v.(*string) = val.(string)
+		}
 	case *bool:
 		switch val {
 		case nil, 0, false, "", "0", "false":
