@@ -3,27 +3,45 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"syscall"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Config represents a configuration file.
 type Config struct {
 	filename string
+	format   string
 	cache    *map[string]interface{}
+}
+
+var extensionsByFormat = map[string][]string{
+	"json": {".json"},
+	"yaml": {".yaml", ".yml"},
 }
 
 // New creates a new Config object.
 func New(filename string) (*Config, error) {
 	config := Config{
 		filename: filename,
+		format:   "",
 		cache:    nil,
 	}
-	err := config.Reload()
+
+	format, err := getConfigFormat(filepath.Ext(filename), extensionsByFormat)
+	if err != nil {
+		return nil, err
+	}
+	config.format = format
+
+	err = config.Reload()
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +139,7 @@ func (config *Config) Get(key string, v interface{}) error {
 
 // Reload clears the config cache.
 func (config *Config) Reload() error {
-	cache, err := primeCacheFromFile(config.filename)
+	cache, err := primeCacheFromFile(config.filename, config.format)
 	config.cache = cache
 
 	if err != nil {
@@ -145,7 +163,7 @@ func (config *Config) watch() {
 	}
 }
 
-func primeCacheFromFile(file string) (*map[string]interface{}, error) {
+func primeCacheFromFile(file string, format string) (*map[string]interface{}, error) {
 	// File exists?
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		return nil, err
@@ -159,9 +177,28 @@ func primeCacheFromFile(file string) (*map[string]interface{}, error) {
 
 	// Unmarshal
 	var config map[string]interface{}
-	if err := json.Unmarshal(raw, &config); err != nil {
-		return nil, err
+	switch format {
+	case "json":
+		if err := json.Unmarshal(raw, &config); err != nil {
+			return nil, err
+		}
+	case "yaml":
+		if err := yaml.Unmarshal(raw, &config); err != nil {
+			return nil, err
+		}
 	}
 
 	return &config, nil
+}
+
+func getConfigFormat(currentExt string, extensionsByFormat map[string][]string) (string, error) {
+	for t, exts := range extensionsByFormat {
+		for _, ext := range exts {
+			if ext == currentExt {
+				return t, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("Unsupported config extension: '%s'", currentExt)
 }

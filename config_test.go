@@ -1,9 +1,8 @@
 package config
 
 import (
-	"testing"
-
 	"os"
+	"testing"
 )
 
 func BenchmarkGet(b *testing.B) {
@@ -17,6 +16,30 @@ func BenchmarkGet(b *testing.B) {
 
 func TestGet(t *testing.T) {
 	t.Run("New", func(t *testing.T) {
+		t.Run("should successfully create new config", func(t *testing.T) {
+			c, err := New("test.json")
+			if err != nil {
+				t.Error(err)
+			} else if c.format != "json" {
+				t.Errorf("Expected format to be 'json', got '%v'", c.format)
+			}
+
+			c2, err := New("test.yaml")
+			if err != nil {
+				t.Error(err)
+			} else if c2.format != "yaml" {
+				t.Errorf("Expected format to be 'yaml', got '%v'", c2.format)
+			}
+		})
+
+		t.Run("should return unsupported type error", func(t *testing.T) {
+			_, err := New("foobar.exe")
+
+			if err == nil || err.Error() != "Unsupported config extension: '.exe'" {
+				t.Error("Expected an unsupported config extension error")
+			}
+		})
+
 		t.Run("should correctly error for nonexistant files", func(t *testing.T) {
 			_, err := New("nonexistant.json")
 			if err == nil {
@@ -33,257 +56,264 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		c, _ := New("test.json")
-		t.Run("should successfully retrieve string", func(t *testing.T) {
-			var s string
+		var testFiles = []string{"test.json", "test.yaml"}
 
-			err := c.Get("string", &s)
-			if err != nil {
-				t.Error(err)
-			}
+		for _, testFile := range testFiles {
+			c, _ := New(testFile)
+			t.Run("should successfully retrieve string", func(t *testing.T) {
+				var s string
 
-			if s != "asdf" {
-				t.Errorf("Expected 'asdf', got '%v'", s)
-			}
-		})
+				err := c.Get("string", &s)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast empty value to string", func(t *testing.T) {
-			var s string
+				if s != "asdf" {
+					t.Errorf("Expected 'asdf', got '%v'", s)
+				}
+			})
 
-			err := c.Get("nonexistant", &s)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast empty value to string", func(t *testing.T) {
+				var s string
 
-			if s != "" {
-				t.Errorf("Expected '', got '%v'", s)
-			}
-		})
+				err := c.Get("nonexistant", &s)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast bool to string", func(t *testing.T) {
-			var s string
+				if s != "" {
+					t.Errorf("Expected '', got '%v'", s)
+				}
+			})
 
-			err := c.Get("bool", &s)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast bool to string", func(t *testing.T) {
+				var s string
 
-			if s != "true" {
-				t.Errorf("Expect 'true', got '%v'", s)
-			}
-		})
+				err := c.Get("bool", &s)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast float to string", func(t *testing.T) {
-			var s string
+				if s != "true" {
+					t.Errorf("Expect 'true', got '%v'", s)
+				}
+			})
 
-			err := c.Get("float64", &s)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast float to string", func(t *testing.T) {
+				var s string
 
-			if s != "64.4" {
-				t.Errorf("Expect '64.4', got '%v'", s)
-			}
-		})
+				err := c.Get("float64", &s)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully retrieve bool", func(t *testing.T) {
-			var b bool
+				if s != "64.4" {
+					t.Errorf("Expect '64.4', got '%v'", s)
+				}
+			})
 
-			err := c.Get("bool", &b)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully retrieve bool", func(t *testing.T) {
+				var b bool
 
-			if b != true {
-				t.Errorf("Expected 'true', got '%v'", b)
-			}
-		})
+				err := c.Get("bool", &b)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast string to bool", func(t *testing.T) {
-			var b bool
+				if b != true {
+					t.Errorf("Expected 'true', got '%v'", b)
+				}
+			})
 
-			err := c.Get("string", &b)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast string to bool", func(t *testing.T) {
+				var b bool
 
-			if b != true {
-				t.Errorf("Expected 'true', got '%v'", b)
-			}
-		})
+				err := c.Get("string", &b)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast empty value to bool", func(t *testing.T) {
-			var b bool
+				if b != true {
+					t.Errorf("Expected 'true', got '%v'", b)
+				}
+			})
 
-			err := c.Get("nonexistant", &b)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast empty value to bool", func(t *testing.T) {
+				var b bool
 
-			if b != false {
-				t.Errorf("Expected 'false', got '%v'", b)
-			}
-		})
+				err := c.Get("nonexistant", &b)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast float to bool", func(t *testing.T) {
-			var b bool
+				if b != false {
+					t.Errorf("Expected 'false', got '%v'", b)
+				}
+			})
 
-			// truthy
-			err := c.Get("float64", &b)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast float to bool", func(t *testing.T) {
+				var b bool
 
-			if b != true {
-				t.Errorf("Expected 'true', got '%v'", b)
-			}
+				// truthy
+				err := c.Get("float64", &b)
+				if err != nil {
+					t.Error(err)
+				}
 
-			// falsey
-			err = c.Get("falsey", &b)
-			if err != nil {
-				t.Error(err)
-			}
+				if b != true {
+					t.Errorf("Expected 'true', got '%v'", b)
+				}
 
-			if b != false {
-				t.Errorf("Expected 'false', got '%v'", b)
-			}
-		})
+				// falsey
+				err = c.Get("falsey", &b)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully retrieve float64", func(t *testing.T) {
-			var f float64
+				if b != false {
+					t.Errorf("Expected 'false', got '%v'", b)
+				}
+			})
 
-			err := c.Get("float64", &f)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully retrieve float64", func(t *testing.T) {
+				var f float64
 
-			if f != 64.4 {
-				t.Errorf("Expected '64.4', got '%v'", f)
-			}
-		})
+				err := c.Get("float64", &f)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast empty value to float64", func(t *testing.T) {
-			var f float64
+				if f != 64.4 {
+					t.Errorf("Expected '64.4', got '%v'", f)
+				}
+			})
 
-			err := c.Get("nonexistant", &f)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast empty value to float64", func(t *testing.T) {
+				var f float64
 
-			if f != 0 {
-				t.Errorf("Expected '0', got '%v'", f)
-			}
-		})
+				err := c.Get("nonexistant", &f)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast string to float", func(t *testing.T) {
-			var f float64
+				if f != 0 {
+					t.Errorf("Expected '0', got '%v'", f)
+				}
+			})
 
-			err := c.Get("string2", &f)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast string to float", func(t *testing.T) {
+				var f float64
 
-			if f != 13.37 {
-				t.Errorf("Expect '13.37', got '%v'", f)
-			}
+				err := c.Get("string2", &f)
+				if err != nil {
+					t.Error(err)
+				}
 
-			err = c.Get("string3", &f)
-			if err != nil {
-				t.Error(err)
-			}
+				if f != 13.37 {
+					t.Errorf("Expect '13.37', got '%v'", f)
+				}
 
-			if f != 0.0 {
-				t.Errorf("Expect '0.0', got '%v'", f)
-			}
-		})
+				err = c.Get("string3", &f)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully override with Env", func(t *testing.T) {
-			var s string
+				if f != 0.0 {
+					t.Errorf("Expect '0.0', got '%v'", f)
+				}
+			})
 
-			err := os.Setenv("string", "abcd")
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully override with Env", func(t *testing.T) {
+				var s string
 
-			err = c.Get("string", &s)
-			if err != nil {
-				t.Error(err)
-			}
+				err := os.Setenv("string", "abcd")
+				if err != nil {
+					t.Error(err)
+				}
+				defer os.Unsetenv("string")
 
-			if s != "abcd" {
-				t.Errorf("Expected 'abcd', got '%v'", s)
-			}
-		})
+				err = c.Get("string", &s)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should correctly cast env to float64", func(t *testing.T) {
-			var f float64
+				if s != "abcd" {
+					t.Errorf("Expected 'abcd', got '%v'", s)
+				}
+			})
 
-			err := os.Setenv("float64-2", "50")
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should correctly cast env to float64", func(t *testing.T) {
+				var f float64
 
-			err = c.Get("float64-2", &f)
-			if err != nil {
-				t.Error(err)
-			}
+				err := os.Setenv("float64-2", "50")
+				if err != nil {
+					t.Error(err)
+				}
+				defer os.Unsetenv("float64-2")
 
-			if f != 50 {
-				t.Errorf("Expected '50', got '%v'", f)
-			}
-		})
+				err = c.Get("float64-2", &f)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should correctly cast env to int", func(t *testing.T) {
-			var i int
+				if f != 50 {
+					t.Errorf("Expected '50', got '%v'", f)
+				}
+			})
 
-			err := os.Setenv("int", "50")
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should correctly cast env to int", func(t *testing.T) {
+				var i int
 
-			err = c.Get("int", &i)
-			if err != nil {
-				t.Error(err)
-			}
+				err := os.Setenv("int", "50")
+				if err != nil {
+					t.Error(err)
+				}
+				defer os.Unsetenv("int")
 
-			if i != 50 {
-				t.Errorf("Expected '50', got '%v'", i)
-			}
-		})
+				err = c.Get("int", &i)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should successfully cast float to int", func(t *testing.T) {
-			var i int
+				if i != 50 {
+					t.Errorf("Expected '50', got '%v'", i)
+				}
+			})
 
-			err := c.Get("float64", &i)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should successfully cast float to int", func(t *testing.T) {
+				var i int
 
-			if i != 64 {
-				t.Errorf("Expected '64', got '%v'", i)
-			}
-		})
+				err := c.Get("float64", &i)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should correctly cast empty value to int", func(t *testing.T) {
-			var i int
+				if i != 64 {
+					t.Errorf("Expected '64', got '%v'", i)
+				}
+			})
 
-			err := c.Get("nonexistant", &i)
-			if err != nil {
-				t.Error(err)
-			}
+			t.Run("should correctly cast empty value to int", func(t *testing.T) {
+				var i int
 
-			if i != 0 {
-				t.Errorf("Expected '0', got '%v'", i)
-			}
-		})
+				err := c.Get("nonexistant", &i)
+				if err != nil {
+					t.Error(err)
+				}
 
-		t.Run("should correctly error for invalid types", func(t *testing.T) {
-			var r rune
+				if i != 0 {
+					t.Errorf("Expected '0', got '%v'", i)
+				}
+			})
 
-			err := c.Get("float64", &r)
-			if err == nil {
-				t.Error("Expected an error, got nil")
-			}
-		})
+			t.Run("should correctly error for invalid types", func(t *testing.T) {
+				var r rune
+
+				err := c.Get("float64", &r)
+				if err == nil {
+					t.Error("Expected an error, got nil")
+				}
+			})
+		}
 	})
 }
