@@ -182,19 +182,6 @@ func TestGet(t *testing.T) {
 			}
 		})
 
-		t.Run("should successfully cast bool to float", func(t *testing.T) {
-			var f float64
-
-			err := c.Get("bool", &f)
-			if err != nil {
-				t.Error(err)
-			}
-
-			if f != 1.0 {
-				t.Errorf("Expect '1.0', got '%v'", f)
-			}
-		})
-
 		t.Run("should successfully override with Env", func(t *testing.T) {
 			var s string
 

@@ -95,12 +95,6 @@ func (config *Config) Get(key string, v interface{}) error {
 			}
 
 			*v.(*float64) = pf
-		} else if b, ok := val.(bool); ok {
-			if b == true {
-				*v.(*float64) = 1.0
-			} else {
-				*v.(*float64) = 0
-			}
 		} else {
 			*v.(*float64) = val.(float64)
 		}
