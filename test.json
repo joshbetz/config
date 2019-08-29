@@ -2,5 +2,7 @@
 	"string": "asdf",
 	"bool": true,
 	"float64": 64.4,
-	"falsey": "false"
+	"falsey": "false",
+	"string2": "13.37",
+	"string3": "0.0"
 }

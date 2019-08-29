@@ -65,7 +65,13 @@ func (config *Config) Get(key string, v interface{}) error {
 			val = ""
 		}
 
-		*v.(*string) = val.(string)
+		if b, ok := val.(bool); ok {
+			*v.(*string) = strconv.FormatBool(b)
+		} else if f, ok := val.(float64); ok {
+			*v.(*string) = strconv.FormatFloat(f, 'f', -1, 64)
+		} else {
+			*v.(*string) = val.(string)
+		}
 	case *bool:
 		switch val {
 		case nil, 0, false, "", "0", "false":
@@ -82,7 +88,16 @@ func (config *Config) Get(key string, v interface{}) error {
 			val = float64(0)
 		}
 
-		*v.(*float64) = val.(float64)
+		if s, ok := val.(string); ok {
+			pf, err := strconv.ParseFloat(s, 64)
+			if err != nil {
+				return err
+			}
+
+			*v.(*float64) = pf
+		} else {
+			*v.(*float64) = val.(float64)
+		}
 	case *int:
 		if val == nil {
 			val = float64(0)
