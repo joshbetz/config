@@ -18,11 +18,19 @@ type Config struct {
 }
 
 // New creates a new Config object.
-func New(filename string) *Config {
-	config := Config{filename, nil}
-	config.Reload()
+func New(filename string) (*Config, error) {
+	config := Config{
+		filename: filename,
+		cache:    nil,
+	}
+	err := config.Reload()
+	if err != nil {
+		return nil, err
+	}
+
 	go config.watch()
-	return &config
+
+	return &config, nil
 }
 
 // Get retreives a Config option into a passed in pointer or returns an error.
