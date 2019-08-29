@@ -5,7 +5,7 @@ go:
     - master
 
 install:
-    - go get github.com/golang/lint/golint
+    - eval "$(gimme 1.10.x)"; go get -x github.com/golang/lint/golint
     - go get -d -v ./...
 
 script:
