@@ -10,15 +10,24 @@ files, and reloads automatically on `SIGHUP`.
 
 ```go
 func main() {
-	c := config.New("config.json")
+	c, err := config.New("config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var value string
-		c.Get("value", &value)
-		fmt.Fprintf(w, "Value: %s", value)
+		err := c.Get("value", &value)
+
+		if err != nil {
+			fmt.Fprintf(w, "Error: %s\n", err)
+			return
+		}
+
+		fmt.Fprintf(w, "Value: %s\n", value)
 	})
 
-	http.ListenAndServe(":3000", nil)
+	log.Fatal(http.ListenAndServe(":3000", nil))
 }
 ```
 
