@@ -9,7 +9,10 @@ import (
 )
 
 func main() {
-	c := config.New("config.json")
+	c, err := config.New("config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var value string
